@@ -5,21 +5,25 @@ language: cpp
 matrix:
   include:
     - os: linux
-      env: TARGET=linux
+      env: ENV=linux
     - os: linux
-      env: TARGET=windows
+      env: ENV=windows
       services:
         - docker
     - os: osx
-      env: TARGET=osx
+      env: ENV=osx
 
 install:
-  - .travis/install-$TARGET
+  - .travis/install-$ENV
+  - . .travis/env-$ENV.sh
+  - git clone --depth=1 https://github.com/iphydf/toxcore
+  - RUN $CMAKE -Btoxcore/_build -Htoxcore -DLOGGING=ON -DDEBUG=ON -DCMAKE_INSTALL_PREFIX:PATH=$CURDIR/libs
+  - RUN $MAKE -C toxcore/_build -j$NPROC -k install
 
 script:
-  - source .travis/env-$TARGET.sh
-  - RUN $CMAKE -B_build -H. -DCMAKE_INSTALL_PREFIX:PATH=$PWD/_install
-  - RUN $MAKE -C _build -j4 -k install
+  - RUN $CMAKE -B_build -H. -DCMAKE_INSTALL_PREFIX:PATH=$CURDIR/_install
+  - RUN $MAKE -C _build -j$NPROC -k install
+  - .travis/git-deploy
 
 branches:
   only:

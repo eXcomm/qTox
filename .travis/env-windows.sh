@@ -5,3 +5,5 @@ RUN() {
 }
 export CMAKE=i686-w64-mingw32.static-cmake
 export MAKE=make
+export NPROC=`nproc`
+export CURDIR=/work

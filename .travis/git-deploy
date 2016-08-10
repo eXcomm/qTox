@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -e
+
+if [ -z "$GIT_TOKEN" ]; then
+  exit 0
+fi
+
+DEPLOY_DIR=toktok.github.io/client/$ENV
+
+git config --global push.default simple
+git config --global user.email "deploy@travis-ci.org"
+git config --global user.name "Travis Deployer"
+
+git clone https://iphydf:$GIT_TOKEN@github.com/TokTok/toktok.github.io
+rm -rf $DEPLOY_DIR
+mkdir -p $DEPLOY_DIR
+
+case $ENV in
+  linux)
+    # Linux: gzip the qtox binary.
+    gzip < _install/bin/qtox > $DEPLOY_DIR/qtox.gz
+    ;;
+  osx)
+    # OSX: deploy the dmg image.
+    cp _build/qtox.dmg $DEPLOY_DIR
+    ;;
+  windows)
+    # Windows: make a zip archive.
+    mv _install/bin/qtox.exe .
+    zip $DEPLOY_DIR/qtox.zip qtox.exe
+    ;;
+  *)
+    echo "Unknown ENV: '$ENV'"
+    exit 1
+    ;;
+esac
+
+cd toktok.github.io
+git add .
+git commit -a -m"Upload new $ENV binaries." --amend
+git push --force
