@@ -18,8 +18,8 @@ install:
 
 script:
   - source .travis/env-$TARGET.sh
-  - RUN $CMAKE -B_build -H.
-  - RUN $MAKE -C _build -j4 -k
+  - RUN $CMAKE -B_build -H. -DCMAKE_INSTALL_PREFIX:PATH=$PWD/_install
+  - RUN $MAKE -C _build -j4 -k install
 
 branches:
   only:

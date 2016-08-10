@@ -32,9 +32,6 @@ set(CMAKE_AUTOMOC ON)
 # Use C++11.
 set(CMAKE_CXX_FLAGS -std=c++11)
 
-# Avoid undefined symbols in libraries.
-set(CMAKE_SHARED_LINKER_FLAGS -Wl,-z,defs)
-
 # Search for headers in current directory.
 include_directories(${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
@@ -112,7 +109,7 @@ if(MINGW)
   link_directories(${QT_PREFIX_PATH}/plugins/platforms)
 endif()
 
-qt5_wrap_ui(qtox_FORMS
+qt5_wrap_ui(${PROJECT_NAME}_FORMS
   src/chatlog/content/filetransferwidget.ui
   src/loginscreen.ui
   src/mainwindow.ui
@@ -128,7 +125,7 @@ qt5_wrap_ui(qtox_FORMS
   src/widget/form/settings/privacysettings.ui
   src/widget/form/settings/userinterfacesettings.ui)
 
-qt5_add_translation(qtox_QM_FILES
+qt5_add_translation(${PROJECT_NAME}_QM_FILES
   translations/ar.ts
   translations/be.ts
   translations/bg.ts
@@ -159,17 +156,17 @@ qt5_add_translation(qtox_QM_FILES
   translations/uk.ts
   translations/zh.ts)
 
-qt5_add_resources(qtox_RESOURCES
+qt5_add_resources(${PROJECT_NAME}_RESOURCES
   res.qrc
   ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
-  DEPENDS ${qtox_QM_FILES})
+  DEPENDS ${${PROJECT_NAME}_QM_FILES})
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/translations.qrc.in"
 "<!DOCTYPE RCC>
 <RCC version=\"1.0\">
   <qresource prefix=\"/translations\">
 ")
-foreach(qm ${qtox_QM_FILES})
+foreach(qm ${${PROJECT_NAME}_QM_FILES})
   get_filename_component(qm_name ${qm} NAME)
   file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/translations.qrc.in"
     "    <file alias=\"${qm_name}\">${qm}</file>\n")
@@ -183,7 +180,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc.in
   ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 
-set(qtox_SOURCES
+set(${PROJECT_NAME}_SOURCES
   src/audio/audio.cpp
   src/audio/audio.h
   src/chatlog/chatlinecontent.cpp
@@ -445,19 +442,19 @@ set(qtox_SOURCES
   src/widget/widget.h)
 
 if(AVFOUNDATION_LIBRARIES)
-  set(qtox_SOURCES ${qtox_SOURCES}
+  set(${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES}
     src/platform/camera/avfoundation.mm
     src/platform/camera/avfoundation.h)
 endif()
 
 
 if(APPINDICATOR_FOUND)
-  set(qtox_DEFINES ${qtox_DEFINES}
+  set(${PROJECT_NAME}_DEFINES ${${PROJECT_NAME}_DEFINES}
     -DENABLE_SYSTRAY_UNITY_BACKEND=1)
 endif()
 
 if(GDK_PIXBUF_FOUND AND GLIB_FOUND AND GTK_FOUND)
-  set(qtox_SOURCES ${qtox_SOURCES}
+  set(${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES}
     src/platform/statusnotifier/closures.c
     src/platform/statusnotifier/closures.h
     src/platform/statusnotifier/enums.c
@@ -466,32 +463,34 @@ if(GDK_PIXBUF_FOUND AND GLIB_FOUND AND GTK_FOUND)
     src/platform/statusnotifier/statusnotifier.c
     src/platform/statusnotifier/statusnotifier.h)
 
-  set(qtox_DEFINES ${qtox_DEFINES}
+  set(${PROJECT_NAME}_DEFINES ${${PROJECT_NAME}_DEFINES}
     -DENABLE_SYSTRAY_STATUSNOTIFIER_BACKEND=1)
 endif()
 
 if(GTK_FOUND)
-  set(qtox_DEFINES ${qtox_DEFINES}
+  set(${PROJECT_NAME}_DEFINES ${${PROJECT_NAME}_DEFINES}
     -DENABLE_SYSTRAY_GTK_BACKEND=1)
 endif()
 
-add_executable(qtox
-  ${qtox_FORMS}
-  ${qtox_RESOURCES}
-  ${qtox_SOURCES}
-  ${qtox_QM_FILES})
+add_executable(${PROJECT_NAME}
+  WIN32
+  MACOSX_BUNDLE
+  ${${PROJECT_NAME}_FORMS}
+  ${${PROJECT_NAME}_RESOURCES}
+  ${${PROJECT_NAME}_SOURCES}
+  ${${PROJECT_NAME}_QM_FILES})
 
-target_link_libraries(qtox Qt5::Core)
-target_link_libraries(qtox Qt5::Gui)
-target_link_libraries(qtox Qt5::Network)
-target_link_libraries(qtox Qt5::OpenGL)
-target_link_libraries(qtox Qt5::Sql)
-target_link_libraries(qtox Qt5::Svg)
-target_link_libraries(qtox Qt5::Widgets)
-target_link_libraries(qtox Qt5::Xml)
+target_link_libraries(${PROJECT_NAME} Qt5::Core)
+target_link_libraries(${PROJECT_NAME} Qt5::Gui)
+target_link_libraries(${PROJECT_NAME} Qt5::Network)
+target_link_libraries(${PROJECT_NAME} Qt5::OpenGL)
+target_link_libraries(${PROJECT_NAME} Qt5::Sql)
+target_link_libraries(${PROJECT_NAME} Qt5::Svg)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} Qt5::Xml)
 
 if(XSS_LIBRARIES)
-  target_link_libraries(qtox ${XSS_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${XSS_LIBRARIES})
 endif()
 
 function(pkg_link_module target module)
@@ -502,22 +501,22 @@ function(pkg_link_module target module)
   endif()
 endfunction()
 
-pkg_link_module(qtox APPINDICATOR)
-pkg_link_module(qtox GDK_PIXBUF)
-pkg_link_module(qtox GLIB)
-pkg_link_module(qtox GTK)
-pkg_link_module(qtox LIBAVCODEC)
-pkg_link_module(qtox LIBAVDEVICE)
-pkg_link_module(qtox LIBAVFORMAT)
-pkg_link_module(qtox LIBAVUTIL)
-pkg_link_module(qtox LIBQRENCODE)
-pkg_link_module(qtox LIBSODIUM)
-pkg_link_module(qtox LIBSWSCALE)
-pkg_link_module(qtox LIBTOXAV)
-pkg_link_module(qtox LIBTOXCORE)
-pkg_link_module(qtox OPENAL)
-pkg_link_module(qtox SQLCIPHER)
-pkg_link_module(qtox VPX)
+pkg_link_module(${PROJECT_NAME} APPINDICATOR)
+pkg_link_module(${PROJECT_NAME} GDK_PIXBUF)
+pkg_link_module(${PROJECT_NAME} GLIB)
+pkg_link_module(${PROJECT_NAME} GTK)
+pkg_link_module(${PROJECT_NAME} LIBAVCODEC)
+pkg_link_module(${PROJECT_NAME} LIBAVDEVICE)
+pkg_link_module(${PROJECT_NAME} LIBAVFORMAT)
+pkg_link_module(${PROJECT_NAME} LIBAVUTIL)
+pkg_link_module(${PROJECT_NAME} LIBQRENCODE)
+pkg_link_module(${PROJECT_NAME} LIBSODIUM)
+pkg_link_module(${PROJECT_NAME} LIBSWSCALE)
+pkg_link_module(${PROJECT_NAME} LIBTOXAV)
+pkg_link_module(${PROJECT_NAME} LIBTOXCORE)
+pkg_link_module(${PROJECT_NAME} OPENAL)
+pkg_link_module(${PROJECT_NAME} SQLCIPHER)
+pkg_link_module(${PROJECT_NAME} VPX)
 
 if(AVFOUNDATION_LIBRARIES AND
     COREMEDIA_LIBRARIES AND
@@ -525,26 +524,44 @@ if(AVFOUNDATION_LIBRARIES AND
     FOUNDATION_LIBRARIES AND
     IOKIT_LIBRARIES AND
     OPENAL_LIBRARIES)
-  target_link_libraries(qtox ${AVFOUNDATION_LIBRARIES})
-  target_link_libraries(qtox ${COREGRAPHICS_LIBRARIES})
-  target_link_libraries(qtox ${COREMEDIA_LIBRARIES})
-  target_link_libraries(qtox ${FOUNDATION_LIBRARIES})
-  target_link_libraries(qtox ${IOKIT_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${AVFOUNDATION_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${COREGRAPHICS_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${COREMEDIA_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${FOUNDATION_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${IOKIT_LIBRARIES})
 endif()
 
-target_compile_options(qtox PRIVATE -DQTOX_PLATFORM_EXT=1)
+target_compile_options(${PROJECT_NAME} PRIVATE -DQTOX_PLATFORM_EXT=1)
 
-target_compile_options(qtox PRIVATE ${qtox_DEFINES})
+target_compile_options(${PROJECT_NAME} PRIVATE ${qtox_DEFINES})
 
-target_compile_options(qtox PRIVATE -DGIT_COMMIT="N/A")
-target_compile_options(qtox PRIVATE -DGIT_DESCRIBE="N/A")
-target_compile_options(qtox PRIVATE -DGIT_VERSION="N/A")
-target_compile_options(qtox PRIVATE -DTIMESTAMP="N/A")
+target_compile_options(${PROJECT_NAME} PRIVATE -DGIT_COMMIT="N/A")
+target_compile_options(${PROJECT_NAME} PRIVATE -DGIT_DESCRIBE="N/A")
+target_compile_options(${PROJECT_NAME} PRIVATE -DGIT_VERSION="N/A")
+target_compile_options(${PROJECT_NAME} PRIVATE -DTIMESTAMP="N/A")
 
 if(MINGW)
-  target_link_libraries(qtox ssl)
-  target_link_libraries(qtox crypto)
-  target_link_libraries(qtox pcre16)
-  target_link_libraries(qtox qwindows)
-  target_link_libraries(qtox ${QT5PLATFORMSUPPORT})
+  target_link_libraries(${PROJECT_NAME} ssl)
+  target_link_libraries(${PROJECT_NAME} crypto)
+  target_link_libraries(${PROJECT_NAME} pcre16)
+  target_link_libraries(${PROJECT_NAME} qwindows)
+  target_link_libraries(${PROJECT_NAME} ${QT5PLATFORMSUPPORT})
+endif()
+
+if(APPLE)
+  find_path(MACDEPLOYQT_PATH macdeployqt PATH_SUFFIXES bin)
+  if(NOT MACDEPLOYQT_PATH)
+    message(FATAL_ERROR "Could not find macdeployqt for OSX bundling. You can point MACDEPLOYQT_PATH to it's path.")
+  endif()
+
+  set(BUNDLE_PATH "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app")
+
+  install(CODE "
+  execute_process(COMMAND ${MACDEPLOYQT_PATH}/macdeployqt \"${BUNDLE_PATH}\")
+  message(STATUS \"Creating dmg of app\")
+  execute_process(COMMAND hdiutil create -volname ${PROJECT_NAME} -srcfolder \"${BUNDLE_PATH}\" -ov -format UDZO \"${PROJECT_NAME}.dmg\")
+  " COMPONENT Runtime
+  )
+else()
+  install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "bin")
 endif()
