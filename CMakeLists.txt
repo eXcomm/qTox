@@ -162,6 +162,7 @@ qt5_add_translation(${PROJECT_NAME}_QM_FILES
 
 qt5_add_resources(${PROJECT_NAME}_RESOURCES
   res.qrc
+  smileys/smileys.qrc
   ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
   DEPENDS ${${PROJECT_NAME}_QM_FILES})
 
