@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8.11)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 set(ENV{PKG_CONFIG_PATH}
   ${CMAKE_SOURCE_DIR}/libs/lib/pkgconfig:/opt/ffmpeg/lib/pkgconfig)
 set(ENV{PKG_CONFIG_PATH_i686_w64_mingw32_static}
