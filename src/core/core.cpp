@@ -284,13 +284,13 @@ void Core::start()
     loadFriends();
 
     tox_callback_friend_request(tox, onFriendRequest, this);
-    tox_callback_friend_message(tox, onFriendMessage, this);
-    tox_callback_friend_name(tox, onFriendNameChange, this);
-    tox_callback_friend_typing(tox, onFriendTypingChange, this);
-    tox_callback_friend_status_message(tox, onStatusMessageChanged, this);
-    tox_callback_friend_status(tox, onUserStatusChanged, this);
+    tox_callback_friend_message(tox, onFriendMessage);
+    tox_callback_friend_name(tox, onFriendNameChange);
+    tox_callback_friend_typing(tox, onFriendTypingChange);
+    tox_callback_friend_status_message(tox, onStatusMessageChanged);
+    tox_callback_friend_status(tox, onUserStatusChanged);
     tox_callback_friend_connection_status(tox, onConnectionStatusChanged, this);
-    tox_callback_friend_read_receipt(tox, onReadReceiptCallback, this);
+    tox_callback_friend_read_receipt(tox, onReadReceiptCallback);
     tox_callback_group_invite(tox, onGroupInvite, this);
     tox_callback_group_message(tox, onGroupMessage, this);
     tox_callback_group_namelist_change(tox, onGroupNamelistChange, this);
